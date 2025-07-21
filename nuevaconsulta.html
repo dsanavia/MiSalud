@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta Nutricional - MiSalud</title>
+    <link rel="icon" type="image/png" href="/img/dhs.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cal+Sans&family=Nunito&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #171721 0%, #2a2a3a 100%);
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: rgba(23, 23, 33, 0.95);
+            padding: 15px 5%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-family: 'Cal Sans', sans-serif;
+            font-size: 1.8rem;
+            color: #ABC538;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            background-color: #ABC538;
+            color: #171721;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background-color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(171, 197, 56, 0.3);
+        }
+
+        /* Contenedor principal */
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(45deg, rgba(171, 197, 56, 0.1), rgba(171, 197, 56, 0.05));
+            border-radius: 20px;
+            border: 1px solid rgba(171, 197, 56, 0.2);
+        }
+
+        .form-header h1 {
+            font-family: 'Cal Sans', sans-serif;
+            font-size: 2.5rem;
+            color: #ABC538;
+            margin-bottom: 10px;
+        }
+
+        .form-header p {
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        /* Formulario */
+        .form-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ABC538;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .required {
+            color: #ff6b6b;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #ABC538;
+            box-shadow: 0 0 0 3px rgba(171, 197, 56, 0.1);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        select option {
+            background-color: #171721;
+            color: #fff;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Mensajes de error */
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .error-message i {
+            margin-right: 5px;
+        }
+
+        .input-error {
+            border-color: #ff6b6b !important;
+            background-color: rgba(255, 107, 107, 0.05) !important;
+        }
+
+        .input-success {
+            border-color: #51cf66 !important;
+            background-color: rgba(81, 207, 102, 0.05) !important;
+        }
+
+        /* Checkbox personalizado */
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .checkbox-custom {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .checkbox-custom input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            width: 0;
+            height: 0;
+        }
+
+        .checkbox-mark {
+            display: block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            background-color: transparent;
+            transition: all 0.3s ease;
+            margin-top: 2px;
+        }
+
+        .checkbox-custom input[type="checkbox"]:checked + .checkbox-mark {
+            background-color: #ABC538;
+            border-color: #ABC538;
+        }
+
+        .checkbox-custom input[type="checkbox"]:checked + .checkbox-mark::after {
+            content: "✓";
+            color: #171721;
+            font-weight: bold;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+        }
+
+        .checkbox-text {
+            color: #ccc;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        /* Botón de envío */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #ABC538, #8fb32b);
+            color: #171721;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(171, 197, 56, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Modal de éxito */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #171721, #2a2a3a);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(171, 197, 56, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            color: #ABC538;
+            margin-bottom: 20px;
+        }
+
+        .modal h2 {
+            color: #ABC538;
+            margin-bottom: 15px;
+            font-family: 'Cal Sans', sans-serif;
+        }
+
+        .modal p {
+            color: #ccc;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background-color: #ABC538;
+            color: #171721;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn:hover {
+            background-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        .form-group {
+            animation: slideIn 0.6s ease forwards;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 15px;
+            }
+
+            .form-container {
+                padding: 25px;
+            }
+
+            .form-header h1 {
+                font-size: 2rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo">MiSalud</a>
+            <a href="index.html" class="back-btn">
+                <i class="bi bi-arrow-left"></i>
+                Volver al inicio
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-header">
+            <h1>Consulta Nutricional</h1>
+            <p>Completa el formulario para recibir una evaluación personalizada de nuestros especialistas</p>
+        </div>
+
+        <div class="form-container">
+            <form id="nutritionForm" novalidate>
+                <div class="form-group">
+                    <label for="fullName">Nombre completo <span class="required">*</span></label>
+                    <input type="text" id="fullName" name="fullName" placeholder="Ingresa tu nombre completo">
+                    <div class="error-message" id="fullNameError">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo electrónico <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="tu.email@ejemplo.com">
+                    <div class="error-message" id="emailError">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Teléfono <span class="required">*</span></label>
+                    <input type="tel" id="phone" name="phone" placeholder="+54 11 1234-5678">
+                    <div class="error-message" id="phoneError">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Edad <span class="required">*</span></label>
+                    <input type="number" id="age" name="age" placeholder="Ingresa tu edad" min="16" max="100">
+                    <div class="error-message" id="ageError">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">Peso (kg) <span class="required">*</span></label>
+                    <input type="number" id="weight" name="weight" placeholder="Ej: 70" min="30" max="300" step="0.1">
+                    <div class="error-message" id="weightError">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Altura (cm) <span class="required">*</span></label>
+                    <input type="number" id="height" name="height" placeholder="Ej: 170" min="120" max="220">
+                    <div class="error-message" id="heightError">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="goal">Objetivo principal <span class="required">*</span></label>
+                    <select id="goal" name="goal">
+                        <option value="">Selecciona tu objetivo</option>
+                        <option value="peso_perdida">Pérdida de peso</option>
+                        <option value="peso_ganancia">Ganancia de peso</option>
+                        <option value="musculo">Ganancia muscular</option>
+                        <option value="mantenimiento">Mantenimiento</option>
+                        <option value="salud">Mejorar salud general</option>
+                        <option value="deportivo">Rendimiento deportivo</option>
+                    </select>
+                    <div class="error-message" id="goalError">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="activity">Nivel de actividad física <span class="required">*</span></label>
+                    <select id="activity" name="activity">
+                        <option value="">Selecciona tu nivel de actividad</option>
+                        <option value="sedentario">Sedentario (poco o nada de ejercicio)</option>
+                        <option value="ligero">Ligero (ejercicio ligero 1-3 días/semana)</option>
+                        <option value="moderado">Moderado (ejercicio moderado 3-5 días/semana)</option>
+                        <option value="intenso">Intenso (ejercicio intenso 6-7 días/semana)</option>
+                        <option value="muy_intenso">Muy intenso (ejercicio muy intenso, trabajo físico)</option>
+                    </select>
+                    <div class="error-message" id="activityError">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <span></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="allergies">Alergias o intolerancias alimentarias</label>
+                    <textarea id="allergies" name="allergies" placeholder="Describe cualquier alergia o intolerancia que tengas (gluten, lactosa, frutos secos, etc.)"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="medications">Medicamentos o suplementos actuales</label>
+                    <textarea id="medications" name="medications" placeholder="Lista los medicamentos o suplementos que tomas actualmente"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="comments">Comentarios adicionales</label>
+                    <textarea id="comments" name="comments" placeholder="Cuéntanos sobre tus hábitos alimentarios, horarios de comida, o cualquier información adicional que consideres importante"></textarea>
+                </div>
+
+                <div class="checkbox-group">
+                    <label class="checkbox-custom">
+                        <input type="checkbox" id="terms" name="terms">
+                        <span class="checkbox-mark"></span>
+                    </label>
+                    <div class="checkbox-text">
+                        Acepto los <a href="#" style="color: #ABC538;">términos y condiciones</a> y autorizo el tratamiento de mis datos personales para fines de evaluación nutricional. <span class="required">*</span>
+                    </div>
+                </div>
+                <div class="error-message" id="termsError">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <span></span>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="bi bi-send"></i>
+                    Enviar Consulta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="bi bi-check-circle"></i>
+            </div>
+            <h2>¡Consulta Enviada!</h2>
+            <p>Gracias por completar el formulario. Nuestro equipo de nutricionistas revisará tu información y se pondrá en contacto contigo en las próximas 24-48 horas.</p>
+            <p><strong>IMC calculado:</strong> <span id="imcResult"></span></p>
+            <button class="modal-btn" onclick="closeModal()">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        // Elementos del DOM
+        const form = document.getElementById('nutritionForm');
+        const modal = document.getElementById('successModal');
+        
+        // Función para mostrar error
+        function showError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(fieldId + 'Error');
+            const errorSpan = errorDiv.querySelector('span');
+            
+            field.classList.add('input-error');
+            field.classList.remove('input-success');
+            errorSpan.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        // Función para mostrar éxito
+        function showSuccess(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(fieldId + 'Error');
+            
+            field.classList.add('input-success');
+            field.classList.remove('input-error');
+            errorDiv.classList.remove('show');
+        }
+
+        // Función para limpiar validación
+        function clearValidation(fieldId) {
+            const field = document.getElementById(fieldId);
+            const errorDiv = document.getElementById(fieldId + 'Error');
+            
+            field.classList.remove('input-error', 'input-success');
+            errorDiv.classList.remove('show');
+        }
+
+        // Validaciones en tiempo real
+        document.getElementById('fullName').addEventListener('input', function() {
+            const value = this.value.trim();
+            if (value.length === 0) {
+                clearValidation('fullName');
+            } else if (value.length < 2) {
+                showError('fullName', 'El nombre debe tener al menos 2 caracteres');
+            } else if (!/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s]+$/.test(value)) {
+                showError('fullName', 'El nombre solo puede contener letras y espacios');
+            } else {
+                showSuccess('fullName');
+            }
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            const value = this.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (value.length === 0) {
+                clearValidation('email');
+            } else if (!emailRegex.test(value)) {
+                showError('email', 'Ingresa un correo electrónico válido');
+            } else {
+                showSuccess('email');
+            }
+        });
+
+        document.getElementById('phone').addEventListener('input', function() {
+            const value = this.value.trim();
+            const phoneRegex = /^[\+]?[0-9\s\-\(\)]+$/;
+            
+            if (value.length === 0) {
+                clearValidation('phone');
+            } else if (value.length < 8) {
+                showError('phone', 'El teléfono debe tener al menos 8 dígitos');
+            } else if (!phoneRegex.test(value)) {
+                showError('phone', 'Ingresa un número de teléfono válido');
+            } else {
+                showSuccess('phone');
+            }
+        });
+
+        document.getElementById('age').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            
+            if (isNaN(value)) {
+                clearValidation('age');
+            } else if (value < 16) {
+                showError('age', 'Debes ser mayor de 16 años');
+            } else if (value > 100) {
+                showError('age', 'Ingresa una edad válida');
+            } else {
+                showSuccess('age');
+            }
+        });
+
+        document.getElementById('weight').addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            
+            if (isNaN(value)) {
+                clearValidation('weight');
+            } else if (value < 30) {
+                showError('weight', 'El peso debe ser mayor a 30 kg');
+            } else if (value > 300) {
+                showError('weight', 'Ingresa un peso válido');
+            } else {
+                showSuccess('weight');
+            }
+        });
+
+        document.getElementById('height').addEventListener('input', function() {
+            const value = parseInt(this.value);
+            
+            if (isNaN(value)) {
+                clearValidation('height');
+            } else if (value < 120) {
+                showError('height', 'La altura debe ser mayor a 120 cm');
+            } else if (value > 220) {
+                showError('height', 'Ingresa una altura válida');
+            } else {
+                showSuccess('height');
+            }
+        });
+
+        // Validación completa del formulario
+        function validateForm() {
+            let isValid = true;
+            
+            // Validar nombre
+            const fullName = document.getElementById('fullName').value.trim();
+            if (!fullName) {
+                showError('fullName', 'El nombre es obligatorio');
+                isValid = false;
+            } else if (fullName.length < 2) {
+                showError('fullName', 'El nombre debe tener al menos 2 caracteres');
+                isValid = false;
+            } else if (!/^[a-záéíóúüñA-ZÁÉÍÓÚÜÑ\s]+$/.test(fullName)) {
+                showError('fullName', 'El nombre solo puede contener letras y espacios');
+                isValid = false;
+            }
+
+            // Validar email
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email) {
+                showError('email', 'El correo electrónico es obligatorio');
+                isValid = false;
+            } else if (!emailRegex.test(email)) {
+                showError('email', 'Ingresa un correo electrónico válido');
+                isValid = false;
+            }
+
+            // Validar teléfono
+            const phone = document.getElementById('phone').value.trim();
+            const phoneRegex = /^[\+]?[0-9\s\-\(\)]+$/;
+            if (!phone) {
+                showError('phone', 'El teléfono es obligatorio');
+                isValid = false;
+            } else if (phone.length < 8 || !phoneRegex.test(phone)) {
+                showError('phone', 'Ingresa un número de teléfono válido');
+                isValid = false;
+            }
+
+            // Validar edad
+            const age = parseInt(document.getElementById('age').value);
+            if (!age) {
+                showError('age', 'La edad es obligatoria');
+                isValid = false;
+            } else if (age < 16 || age > 100) {
+                showError('age', 'La edad debe estar entre 16 y 100 años');
+                isValid = false;
+            }
+
+            // Validar peso
+            const weight = parseFloat(document.getElementById('weight').value);
+            if (!weight) {
+                showError('weight', 'El peso es obligatorio');
+                isValid = false;
+            } else if (weight < 30 || weight > 300) {
+                showError('weight', 'Ingresa un peso válido (30-300 kg)');
+                isValid = false;
+            }
+
+            // Validar altura
+            const height = parseInt(document.getElementById('height').value);
+            if (!height) {
+                showError('height', 'La altura es obligatoria');
+                isValid = false;
+            } else if (height < 120 || height > 220) {
+                showError('height', 'Ingresa una altura válida (120-220 cm)');
+                isValid = false;
+            }
+
+            // Validar objetivo
+            const goal = document.getElementById('goal').value;
+            if (!goal) {
+                showError('goal', 'Selecciona tu objetivo principal');
+                isValid = false;
+            }
+
+            // Validar actividad
+            const activity = document.getElementById('activity').value;
+            if (!activity) {
+                showError('activity', 'Selecciona tu nivel de actividad física');
+                isValid = false;
+            }
+
+            // Validar términos
+            const terms = document.getElementById('terms').checked;
+            if (!terms) {
+                showError('terms', 'Debes aceptar los términos y condiciones');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Función para calcular IMC
+        function calculateIMC(weight, height) {
+            const heightInM = height / 100;
+            const imc = weight / (heightInM * heightInM);
+            return imc.toFixed(1);
+        }
+
+        // Función para interpretar IMC
+        function interpretIMC(imc) {
+            if (imc < 18.5) return 'Bajo peso';
+            if (imc < 25) return 'Peso normal';
+            if (imc < 30) return 'Sobrepeso';
+            return 'Obesidad';
+        }
+
+        // Manejar envío del formulario
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (validateForm()) {
+                // Calcular IMC
+                const weight = parseFloat(document.getElementById('weight').value);
+                const height = parseInt(document.getElementById('height').value);
+                const imc = calculateIMC(weight, height);
+                const imcCategory = interpretIMC(parseFloat(imc));
+                
+                // Mostrar resultado en el modal
+                document.getElementById('imcResult').textContent = `${imc} (${imcCategory})`;
+                
+                // Mostrar modal de éxito
+                modal.style.display = 'block';
+                
+                // Limpiar formulario después de un momento
+                setTimeout(() => {
+                    form.reset();
+                    // Limpiar todas las validaciones
+                    ['fullName', 'email', 'phone', 'age', 'weight', 'height', 'goal', 'activity', 'terms'].forEach(fieldId => {
+                        clearValidation(fieldId);
+                    });
+                }, 1000);
+            } else {
+                // Scroll al primer error
+                const firstError = document.querySelector('.input-error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            }
+        });
+
+        // Función para cerrar modal
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Limpiar validación cuando se selecciona una opción
+        document.getElementById('goal').addEventListener('change', function() {
+            if (this.value) {
+                showSuccess('goal');
+            } else {
+                clearValidation('goal');
+            }
+        });
+
+        document.getElementById('activity').addEventListener('change', function() {
+            if (this.value) {
+                showSuccess('activity');
+            } else {
+                clearValidation('activity');
+            }
+        });
+
+        document.getElementById('terms').addEventListener('change', function() {
+            if (this.checked) {
+                showSuccess('terms');
+            } else {
+                clearValidation('terms');
+            }
